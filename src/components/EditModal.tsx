@@ -1,55 +1,55 @@
-import { useState } from 'react'
-import { useRemeshDomain, useRemeshQuery, useRemeshSend } from 'remesh-react'
+import { useState, useRef } from 'react'
 import type { ChangeEvent } from 'react'
-import classNames from 'classnames'
+import { useRemeshDomain, useRemeshSend } from 'remesh-react'
 import type { PM } from '@kennys_wang/pm-core'
-import { SearchDomain, AccountDomain } from '../domains'
+import classNames from 'classnames';
+import { AccountDomain } from '../domains'
 import { Modal } from './Modal'
 
-export function Search() {
+interface EditModalProps {
+  data: PM;
+  visible: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
+export function EditModal({
+  data,
+  visible,
+  onCancel,
+  onConfirm,
+}: EditModalProps) {
   const send = useRemeshSend()
-  const [visible, setVisible] = useState(false)
+  const accountDomain = useRemeshDomain(AccountDomain())
   const [errorField, setErrorField] = useState<'account' | 'password' | 'confirmPwd' | ''>('')
   const [message, setMessage] = useState('')
-  const searchDomain = useRemeshDomain(SearchDomain())
-  const accountDomain = useRemeshDomain(AccountDomain())
-  const keyword = useRemeshQuery(searchDomain.query.KeywordQuery())
-  const record = useRemeshQuery(accountDomain.query.RecordQuery())
-  
-  const handleKeywordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    send(searchDomain.command.SetKeywordCommand(e.target.value))
-  }
+  const [record, setRecord] = useState<PM & { confirmPwd: string }>({
+    ...data,
+    password: '',
+    confirmPwd: ''
+  })
+  const originRecord = useRef<PM>({ ...data })
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>, name: keyof (PM & { confirmPwd?: string })) => {
-    send(accountDomain.command.MergeRecordCommand({ [name]: e.target.value }))
+    setRecord({
+      ...record,
+      [name]: e.target.value
+    })
   }
   const handleCancel = () => {
     reset()
-    setVisible(false)
+    onCancel()
   }
   const reset = () => {
-    send(accountDomain.command.ClearRecordCommand())
     setMessage('')
     setErrorField('')
   }
   const handleConfirm = () => {
     try {
-      const account = record.account.trim()
       const password = record.password.trim()
       const confirmPwd = record.confirmPwd.trim()
 
-      if (!account) {
-        setMessage('账号为必填项')
-        setErrorField('account')
-        return
-      } else if (!password) {
-        setMessage('密码为必填项')
-        setErrorField('password')
-        return
-      } else if (!confirmPwd) {
-        setMessage('确认密码为必填项')
-        setErrorField('confirmPwd')
-        return
-      } else if (password !== confirmPwd) {
+      if (password !== confirmPwd) {
         setMessage('两次密码不一致')
         setErrorField('confirmPwd')
         return
@@ -61,58 +61,41 @@ export function Search() {
       const board = record.board.trim()
       const remark = record.remark.trim()
       
-      window.pm.createAccount({
-        account,
-        password,
-        board,
-        remark
-      })
+      if (password && password !== originRecord.current.password) {
+        console.log('修改密码')
+        window.pm.editAccount(record.id, password)
+      }
+      if (board !== originRecord.current.board) {
+        console.log('修改面板')
+        window.pm.moveAccount(record.id, board)
+      }
+      if (remark !== originRecord.current.remark) {
+        console.log('修改备注')
+        window.pm.remarkAccount(record.id, remark)
+      }
 
       send(accountDomain.command.SetListCommand(window.pm.getList().reverse()))
 
-      setVisible(false)
-      send(accountDomain.command.ClearRecordCommand())
+      onConfirm()
     } catch (e) {
       console.error(e)
     }
   }
 
   return (
-    <div className="flex">
-      <input
-        type="text"
-        placeholder="请输入关键字"
-        className="input input-bordered input-sm w-full max-w-xs"
-        value={keyword}
-        onChange={handleKeywordChange}
-        style={{ color: '#fff' }}
-      />
-      <button
-        className="btn btn-outline btn-sm ml-2"
-      >
-        搜索
-      </button>
-      <label
-        className="btn btn-primary btn-sm ml-2 modal-button"
-        onClick={() => setVisible(true)}
-      >
-        创建账号
-      </label>
-      <Modal
-        visible={visible}
-        title='创建账号'
-        onCancel={handleCancel}
-        onConfirm={handleConfirm}
-      >
-        <div className='flex justify-center mt-5'>
+    <Modal
+      visible={visible}
+      title='编辑账号'
+      onCancel={handleCancel}
+      onConfirm={handleConfirm}
+    >
+      <div className='flex justify-center mt-5'>
           <input
             type="text"
             placeholder="请输入账号"
-            className={classNames("input input-bordered input-sm w-full max-w-xs", {
-              'input-error': errorField === 'account'
-            })}
+            className="input input-bordered input-sm w-full max-w-xs"
             value={record.account}
-            onChange={(e) => handleChange(e, 'account')}
+            disabled
             style={{ color: '#fff' }}
           />
         </div>
@@ -169,7 +152,6 @@ export function Search() {
             </div>
           )
         }
-      </Modal>
-    </div>
+    </Modal>
   )
 }

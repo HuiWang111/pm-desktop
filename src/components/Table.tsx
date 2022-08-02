@@ -2,10 +2,10 @@ import classNames from 'classnames'
 import type { ReactNode } from 'react'
 import chunk from 'lodash.chunk'
 
-interface Column {
+interface Column<T> {
   title: string;
   dataIndex: string;
-  render?: (text: any, record: Record<string, string>, index: number) => ReactNode
+  render?: (text: any, record: T, index: number) => ReactNode
 }
 
 interface Pagination {
@@ -14,16 +14,16 @@ interface Pagination {
   onChange?: (current: number) => void;
 }
 
-export interface TableProps {
-  dataSource: Record<string, string>[];
-  columns: Column[];
-  rowKey: (item: Record<string, string>) => string;
+export interface TableProps<T> {
+  dataSource: T[];
+  columns: Column<T>[];
+  rowKey: (item: T) => string;
   compact?: boolean;
   className?: string;
   pagination?: Pagination;
 }
 
-export function Table(props: TableProps) {
+export function Table<T extends Record<any, any>>(props: TableProps<T>) {
   const {
     dataSource = [],
     columns = [],

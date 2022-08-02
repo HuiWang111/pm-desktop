@@ -9,3 +9,7 @@
 .anticon {
   cursor: pointer;
 }
+
+.anticon:active {
+  opacity: .7;
+}

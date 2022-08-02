@@ -16,5 +16,8 @@ contextBridge.exposeInMainWorld('pm', {
     const item = passwordManager.get(id, '')
     clipboard.writeText(item.password)
   },
-  getAccount: (id, mask) => passwordManager.get(id, mask)
+  getAccount: (id, mask) => passwordManager.get(id, mask),
+  remarkAccount: (id, remark) => passwordManager.remark(id, remark),
+  editAccount: (id, pwd) => passwordManager.edit(id, pwd),
+  moveAccount: (id, board) => passwordManager.move(id, board)
 })

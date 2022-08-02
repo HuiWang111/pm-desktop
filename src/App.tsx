@@ -1,29 +1,38 @@
 import { useRemeshDomain, useRemeshQuery, useRemeshSend } from 'remesh-react'
+import { useState, useRef } from 'react'
+import type { PM } from '@kennys_wang/pm-core'
 import {
   DeleteOutlined,
   CopyOutlined,
   EyeOutlined,
-  EyeInvisibleOutlined
+  EyeInvisibleOutlined,
+  EditOutlined
 } from '@ant-design/icons'
 import {
   Search,
   Table,
-  NavBar
+  NavBar,
+  EditModal
 } from './components'
 import { AccountDomain } from './domains'
 
 function App() {
   const send = useRemeshSend()
+  const [visible, setVisible] = useState(false)
   const accountDomain = useRemeshDomain(AccountDomain())
   const list = useRemeshQuery(accountDomain.query.ListQuery())
   const page = useRemeshQuery(accountDomain.query.PageQuery())
+  const record = useRef<PM | null>(null)
+
+  const hideModal = () => setVisible(false)
+  const showModal = () => setVisible(true)
 
   return (
     <div className="App bg-base-100">
       <NavBar />
       <div className='ml-10 mr-10 mt-5'>
         <Search />
-        <Table
+        <Table<PM>
           className='mt-5'
           columns={[
             { title: '编号', dataIndex: 'id' },
@@ -31,8 +40,9 @@ function App() {
             { title: '密码', dataIndex: 'password' },
             { title: '面板', dataIndex: 'board' },
             { title: '备注', dataIndex: 'remark' },
-            { title: '', dataIndex: 'operation', render: (t, { id, password }) => {
-              const isHidden = password === '******'
+            { title: '操作', dataIndex: 'operation', render: (t, item: PM) => {
+              const { id, password } = item
+              const isHidden: boolean = password === '******'
 
               return (
                 <>
@@ -102,11 +112,18 @@ function App() {
                         />
                       )
                   }
+                  <EditOutlined
+                    className='mr-4'
+                    onClick={() => {
+                      record.current = { ...item }
+                      showModal()
+                    }}
+                  />
                 </>
               )
             } }
           ]}
-          dataSource={list as any as Record<string, string>[]}
+          dataSource={list}
           rowKey={data => data.id}
           pagination={{
             current: page,
@@ -117,6 +134,16 @@ function App() {
           }}
         />
       </div>
+      {
+        visible && (
+          <EditModal
+            visible={visible}
+            onCancel={hideModal}
+            onConfirm={hideModal}
+            data={record.current!}
+          />
+        )
+      }
     </div>
   )
 }

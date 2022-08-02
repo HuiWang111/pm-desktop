@@ -6,6 +6,9 @@ interface PasswordManager {
   deleteAccount: (id: string) => void;
   copyPassword: (id: string) => void;
   getAccount: (id: string, mask?: string) => PM;
+  remarkAccount: (id: string, remark: string) => void;
+  editAccount: (id: string, pwd: string) => void;
+  moveAccount: (id: string, board: string) => void;
 }
 
 declare global {
