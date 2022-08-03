@@ -9,6 +9,7 @@ interface PasswordManager {
   remarkAccount: (id: string, remark: string) => void;
   editAccount: (id: string, pwd: string) => void;
   moveAccount: (id: string, board: string) => void;
+  findAccounts: (keyword: string, mask?: string) => PM[];
 }
 
 declare global {

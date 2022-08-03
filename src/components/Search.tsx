@@ -76,12 +76,19 @@ export function Search() {
       console.error(e)
     }
   }
+  const handleSearch = () => {
+    if (keyword) {
+      send(accountDomain.command.SetListCommand(window.pm.findAccounts(keyword)))
+    } else {
+      send(accountDomain.command.SetListCommand(window.pm.getList().reverse()))
+    }
+  }
 
   return (
     <div className="flex">
       <input
         type="text"
-        placeholder="请输入关键字"
+        placeholder="请输入账号或备注关键字搜索"
         className="input input-bordered input-sm w-full max-w-xs"
         value={keyword}
         onChange={handleKeywordChange}
@@ -89,6 +96,7 @@ export function Search() {
       />
       <button
         className="btn btn-outline btn-sm ml-2"
+        onClick={handleSearch}
       >
         搜索
       </button>

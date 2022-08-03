@@ -19,5 +19,6 @@ contextBridge.exposeInMainWorld('pm', {
   getAccount: (id, mask) => passwordManager.get(id, mask),
   remarkAccount: (id, remark) => passwordManager.remark(id, remark),
   editAccount: (id, pwd) => passwordManager.edit(id, pwd),
-  moveAccount: (id, board) => passwordManager.move(id, board)
+  moveAccount: (id, board) => passwordManager.move(id, board),
+  findAccounts: (keyword, mask) => passwordManager.find(keyword, mask)
 })

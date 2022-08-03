@@ -47,7 +47,6 @@ export function Table<T extends Record<any, any>>(props: TableProps<T>) {
         className={classNames("table w-full", {
           'table-compact': compact
         })}
-        style={{ border: '1px solid rgb(36, 41, 51)' }}
       >
         <thead>
           <tr>

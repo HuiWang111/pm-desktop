@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .App {
-  min-height: 100vh
+  min-height: 100vh;
 }
 
 .anticon {
@@ -12,4 +12,8 @@
 
 .anticon:active {
   opacity: .7;
+}
+
+.my-account {
+  height: calc(100vh - 136px);
 }
