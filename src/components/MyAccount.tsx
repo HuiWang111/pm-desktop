@@ -8,23 +8,27 @@ import {
   EyeInvisibleOutlined,
   EditOutlined
 } from '@ant-design/icons'
-import {
-  Search,
-  Table,
-  EditModal
-} from '.'
-import { AccountDomain } from '../domains'
+import { Search } from './Search'
+import { Table } from './Table'
+import { EditModal } from './EditModal'
+import { AccountDomain, ArchivedAccountsDomain } from '@/domains'
+import { useMount } from '@/hooks'
 
 export function MyAccount() {
   const send = useRemeshSend()
   const [visible, setVisible] = useState(false)
   const accountDomain = useRemeshDomain(AccountDomain())
+  const archivedDomain = useRemeshDomain(ArchivedAccountsDomain())
   const list = useRemeshQuery(accountDomain.query.ListQuery())
   const page = useRemeshQuery(accountDomain.query.PageQuery())
   const record = useRef<PM | null>(null)
-
+  
   const hideModal = () => setVisible(false)
   const showModal = () => setVisible(true)
+
+  useMount(() => {
+    send(accountDomain.command.SetListCommand(window.pm.getList()))
+  })
 
   return (
     <div className="my-account mt-5">
@@ -49,7 +53,8 @@ export function MyAccount() {
                     try {
                       if (confirm('确认删除该账号吗？')) {
                         window.pm.deleteAccount(id)
-                        send(accountDomain.command.SetListCommand(window.pm.getList().reverse()))
+                        send(accountDomain.command.SetListCommand(window.pm.getList()))
+                        send(archivedDomain.command.SetListCommand(window.pm.getList()))
                       }
                     } catch (e) {
                       console.error(e)

@@ -10,6 +10,9 @@ interface PasswordManager {
   editAccount: (id: string, pwd: string) => void;
   moveAccount: (id: string, board: string) => void;
   findAccounts: (keyword: string, mask?: string) => PM[];
+  getArchivedAccounts: (mask?: string) => PM[];
+  clearArchivedAccounts: () => void;
+  restore: (ids: string[]) => void;
 }
 
 declare global {

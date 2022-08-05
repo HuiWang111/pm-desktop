@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { MyAccount, Tabs, NavBar } from './components'
+import {
+  MyAccount,
+  Tabs,
+  NavBar,
+  ArchivedAccounts
+} from '@/components'
 import { TabKey } from './types'
 
 function App() {
@@ -25,6 +30,11 @@ function App() {
         {
           active === 'accounts' && (
             <MyAccount />
+          )
+        }
+        {
+          active === 'archived' && (
+            <ArchivedAccounts />
           )
         }
       </div>

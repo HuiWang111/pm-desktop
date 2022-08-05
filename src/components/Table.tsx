@@ -63,7 +63,7 @@ export function Table<T extends Record<any, any>>(props: TableProps<T>) {
         </thead>
         <tbody>
           {
-            list.map((data) => {
+            list?.map((data) => {
               const key = rowKey(data)
 
               return (
@@ -90,7 +90,7 @@ export function Table<T extends Record<any, any>>(props: TableProps<T>) {
         </tbody>
       </table>
       {
-        pagination
+        pagination && totalPage > 0
           ? (
             <div className='flex mt-5 items-center justify-center'>
               <div className="btn-group">

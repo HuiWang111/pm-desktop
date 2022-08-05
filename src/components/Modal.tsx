@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom'
 import type { PropsWithChildren, ReactNode } from 'react'
-import { noop } from '../utils'
+import { noop } from '@/utils'
 
 interface ModalProps {
   visible?: boolean;

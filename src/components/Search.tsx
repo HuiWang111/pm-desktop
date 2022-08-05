@@ -3,7 +3,7 @@ import { useRemeshDomain, useRemeshQuery, useRemeshSend } from 'remesh-react'
 import type { ChangeEvent } from 'react'
 import classNames from 'classnames'
 import type { PM } from '@kennys_wang/pm-core'
-import { SearchDomain, AccountDomain } from '../domains'
+import { SearchDomain, AccountDomain } from '@/domains'
 import { Modal } from './Modal'
 
 export function Search() {
@@ -68,7 +68,7 @@ export function Search() {
         remark
       })
 
-      send(accountDomain.command.SetListCommand(window.pm.getList().reverse()))
+      send(accountDomain.command.SetListCommand(window.pm.getList()))
 
       setVisible(false)
       send(accountDomain.command.ClearRecordCommand())
@@ -80,7 +80,7 @@ export function Search() {
     if (keyword) {
       send(accountDomain.command.SetListCommand(window.pm.findAccounts(keyword)))
     } else {
-      send(accountDomain.command.SetListCommand(window.pm.getList().reverse()))
+      send(accountDomain.command.SetListCommand(window.pm.getList()))
     }
   }
 

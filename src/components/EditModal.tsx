@@ -3,7 +3,7 @@ import type { ChangeEvent } from 'react'
 import { useRemeshDomain, useRemeshSend } from 'remesh-react'
 import type { PM } from '@kennys_wang/pm-core'
 import classNames from 'classnames';
-import { AccountDomain } from '../domains'
+import { AccountDomain } from '@/domains'
 import { Modal } from './Modal'
 
 interface EditModalProps {
@@ -74,7 +74,7 @@ export function EditModal({
         window.pm.remarkAccount(record.id, remark)
       }
 
-      send(accountDomain.command.SetListCommand(window.pm.getList().reverse()))
+      send(accountDomain.command.SetListCommand(window.pm.getList()))
 
       onConfirm()
     } catch (e) {
