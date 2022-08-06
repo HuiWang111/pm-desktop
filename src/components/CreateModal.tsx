@@ -1,108 +1,59 @@
 import { useState, useRef } from 'react'
 import type { ChangeEvent } from 'react'
-import { useRemeshDomain, useRemeshSend } from 'remesh-react'
 import type { PM } from '@kennys_wang/pm-core'
 import classNames from 'classnames';
-import { AccountDomain } from '@/domains'
 import { Modal } from '@/ui'
 import { useMount } from '@/hooks'
 
-interface EditModalProps {
-  data: PM;
+interface CreateModalProps {
   visible: boolean;
-  onCancel: () => void;
-  onConfirm: () => void;
+  record: Omit<PM, 'id'> & { confirmPwd: string };
+  onChange: (e: ChangeEvent<HTMLInputElement>, name: keyof (PM & { confirmPwd?: string })) => void;
+  onCancel: (reset: () => void) => void;
+  onConfirm: (
+    setMessage: (msg: string) => void,
+    setErrorField: (field: 'account' | 'password' | 'confirmPwd' | '') => void
+  ) => void;
 }
 
-export function EditModal({
-  data,
+export function CreateModal({
   visible,
+  record,
+  onChange,
   onCancel,
-  onConfirm,
-}: EditModalProps) {
-  const send = useRemeshSend()
-  const accountDomain = useRemeshDomain(AccountDomain())
+  onConfirm
+}: CreateModalProps) {
   const [errorField, setErrorField] = useState<'account' | 'password' | 'confirmPwd' | ''>('')
   const [message, setMessage] = useState('')
-  const [record, setRecord] = useState<PM & { confirmPwd: string }>({
-    ...data,
-    password: '',
-    confirmPwd: ''
-  })
-  const originRecord = useRef<PM>({ ...data })
   const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const reset = () => {
+    setMessage('')
+    setErrorField('')
+  }
 
   useMount(() => {
     inputRef.current?.focus()
   })
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>, name: keyof (PM & { confirmPwd?: string })) => {
-    setRecord({
-      ...record,
-      [name]: e.target.value
-    })
-  }
-  const handleCancel = () => {
-    reset()
-    onCancel()
-  }
-  const reset = () => {
-    setMessage('')
-    setErrorField('')
-  }
-  const handleConfirm = () => {
-    try {
-      const password = record.password.trim()
-      const confirmPwd = record.confirmPwd.trim()
-
-      if (password !== confirmPwd) {
-        setMessage('两次密码不一致')
-        setErrorField('confirmPwd')
-        return
-      }
-      
-      setMessage('')
-      setErrorField('')
-
-      const board = record.board.trim()
-      const remark = record.remark.trim()
-      
-      if (password && password !== originRecord.current.password) {
-        console.log('修改密码')
-        window.pm.editAccount(record.id, password)
-      }
-      if (board !== originRecord.current.board) {
-        console.log('修改面板')
-        window.pm.moveAccount(record.id, board)
-      }
-      if (remark !== originRecord.current.remark) {
-        console.log('修改备注')
-        window.pm.remarkAccount(record.id, remark)
-      }
-
-      send(accountDomain.command.SetListCommand(window.pm.getList()))
-
-      onConfirm()
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
   return (
     <Modal
-      visible={visible}
-      title='编辑账号'
-      onCancel={handleCancel}
-      onConfirm={handleConfirm}
-    >
-      <div className='flex justify-center mt-5'>
+        visible={visible}
+        title='创建账号'
+        onCancel={() => onCancel(reset)}
+        onConfirm={() => onConfirm(setMessage, setErrorField)}
+      >
+        <div className='flex justify-center mt-5'>
           <input
             type="text"
             placeholder="请输入账号"
-            className="input input-bordered input-sm w-full max-w-xs"
+            className={classNames("input input-bordered input-sm w-full max-w-xs", {
+              'input-error': errorField === 'account'
+            })}
             value={record.account}
-            disabled
+            onChange={(e) => onChange(e, 'account')}
             style={{ color: '#fff' }}
+            ref={inputRef}
           />
         </div>
         <div className='flex justify-center mt-5'>
@@ -113,9 +64,8 @@ export function EditModal({
               'input-error': errorField === 'password'
             })}
             value={record.password}
-            onChange={(e) => handleChange(e, 'password')}
+            onChange={(e) => onChange(e, 'password')}
             style={{ color: '#fff' }}
-            ref={inputRef}
           />
         </div>
         <div className='flex justify-center mt-5'>
@@ -126,7 +76,7 @@ export function EditModal({
               'input-error': errorField === 'confirmPwd'
             })}
             value={record.confirmPwd}
-            onChange={(e) => handleChange(e, 'confirmPwd')}
+            onChange={(e) => onChange(e, 'confirmPwd')}
             style={{ color: '#fff' }}
           />
         </div>
@@ -136,7 +86,7 @@ export function EditModal({
             placeholder="请输入面板"
             className="input input-bordered input-sm w-full max-w-xs"
             value={record.board}
-            onChange={(e) => handleChange(e, 'board')}
+            onChange={(e) => onChange(e, 'board')}
             style={{ color: '#fff' }}
           />
         </div>
@@ -146,7 +96,7 @@ export function EditModal({
             placeholder="请输入备注"
             className="input input-bordered input-sm w-full max-w-xs"
             value={record.remark}
-            onChange={(e) => handleChange(e, 'remark')}
+            onChange={(e) => onChange(e, 'remark')}
             style={{ color: '#fff' }}
           />
         </div>
@@ -159,6 +109,6 @@ export function EditModal({
             </div>
           )
         }
-    </Modal>
+      </Modal>
   )
 }

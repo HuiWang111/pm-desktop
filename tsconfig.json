@@ -21,7 +21,9 @@
       "@/hooks": ["./src/hooks"],
       "@/components": ["./src/components"],
       "@/domains": ["./src/domains"],
-      "@/utils": ["./src/utils"]
+      "@/utils": ["./src/utils"],
+      "@/ui": ["./src/ui"],
+      "@/styles": ["./src/styles"]
     }
   },
   "include": ["src"],

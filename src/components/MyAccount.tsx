@@ -9,19 +9,25 @@ import {
   EditOutlined
 } from '@ant-design/icons'
 import { Search } from './Search'
-import { Table } from './Table'
+import { Table } from '@/ui'
 import { EditModal } from './EditModal'
+import { ValidateMainPasswordModal, OnConfirm } from './ValidateMainPassword'
+import { MainPasswordModal } from './MainPasswordModal'
 import { AccountDomain, ArchivedAccountsDomain } from '@/domains'
 import { useMount } from '@/hooks'
+import '@/styles/my-account.less'
 
 export function MyAccount() {
   const send = useRemeshSend()
   const [visible, setVisible] = useState(false)
+  const [mainVisible, setMainVisible] = useState(false)
+  const [validVisible, setValidVisible] = useState(false)
   const accountDomain = useRemeshDomain(AccountDomain())
   const archivedDomain = useRemeshDomain(ArchivedAccountsDomain())
   const list = useRemeshQuery(accountDomain.query.ListQuery())
   const page = useRemeshQuery(accountDomain.query.PageQuery())
   const record = useRef<PM | null>(null)
+  const validatePwdOnConfirm = useRef<OnConfirm>(null)
   
   const hideModal = () => setVisible(false)
   const showModal = () => setVisible(true)
@@ -31,7 +37,7 @@ export function MyAccount() {
   })
 
   return (
-    <div className="my-account mt-5">
+    <main className="my-account main-content mt-5">
       <Search />
       <Table<PM>
         className='mt-5'
@@ -49,6 +55,7 @@ export function MyAccount() {
               <>
                 <DeleteOutlined
                   className='mr-4'
+                  title='删除账号'
                   onClick={() => {
                     try {
                       if (confirm('确认删除该账号吗？')) {
@@ -63,11 +70,28 @@ export function MyAccount() {
                 />
                 <CopyOutlined
                   className='mr-4'
+                  title='复制密码'
                   onClick={() => {
-                    try {
-                      window.pm.copyPassword(id)
-                    } catch (e) {
-                      console.error(e)
+                    if (!window.pm.hasMainPassword()) {
+                      setMainVisible(true)
+                      return
+                    }
+
+                    setValidVisible(true)
+
+                    validatePwdOnConfirm.current = (pwd, setMsg, reset) => {
+                      try {
+                        if (window.pm.validateMainPassword(pwd)) {
+                          setValidVisible(false)
+                          reset()
+                          window.pm.copyPassword(id)
+                          alert('复制密码成功')
+                        } else {
+                          setMsg('密码不正确')
+                        }
+                      } catch (e) {
+                        console.error(e)
+                      }
                     }
                   }}
                 />
@@ -76,19 +100,35 @@ export function MyAccount() {
                     ? (
                       <EyeOutlined
                         className='mr-4'
-                        onClick={() => {
-                          try {
-                            const account = window.pm.getAccount(id, '')
-                            send(accountDomain.command.SetListCommand([
-                              ...list.map(i => {
-                                if (i.id === account.id) {
-                                  i.password = account.password
-                                }
-                                return { ...i }
-                              })
-                            ]))
-                          } catch (e) {
-                            console.error(e)
+                        title='显示密码'
+                        onClick={async () => {
+                          if (!window.pm.hasMainPassword()) {
+                            setMainVisible(true)
+                            return
+                          }
+
+                          setValidVisible(true)
+
+                          validatePwdOnConfirm.current = (pwd, setMsg, reset) => {
+                            try {
+                              if (window.pm.validateMainPassword(pwd)) {
+                                setValidVisible(false)
+                                reset()
+                                const account = window.pm.getAccount(id, '')
+                                send(accountDomain.command.SetListCommand([
+                                  ...list.map(i => {
+                                    if (i.id === account.id) {
+                                      i.password = account.password
+                                    }
+                                    return { ...i }
+                                  })
+                                ]))
+                              } else {
+                                setMsg('密码不正确')
+                              }
+                            } catch (e) {
+                              console.error(e)
+                            }
                           }
                         }}
                       />
@@ -96,6 +136,7 @@ export function MyAccount() {
                     : (
                       <EyeInvisibleOutlined
                         className='mr-4'
+                        title='隐藏密码'
                         onClick={() => {
                           try {
                             const account = window.pm.getAccount(id)
@@ -116,6 +157,7 @@ export function MyAccount() {
                 }
                 <EditOutlined
                   className='mr-4'
+                  title='编辑账号'
                   onClick={() => {
                     record.current = { ...item }
                     showModal()
@@ -145,6 +187,31 @@ export function MyAccount() {
           />
         )
       }
-    </div>
+      {
+        mainVisible && (
+          <MainPasswordModal
+            visible={mainVisible}
+            onCancel={() => {
+              setMainVisible(false)
+            }}
+            onConfirm={(pwd) => {
+              setMainVisible(false)
+              window.pm.setMainPassword(pwd)
+            }}
+          />
+        )
+      }
+      {
+        validVisible && (
+          <ValidateMainPasswordModal
+            visible={validVisible}
+            onCancel={() => {
+              setValidVisible(false)
+            }}
+            onConfirm={validatePwdOnConfirm.current}
+          />
+        )
+      }
+    </main>
   )
 }

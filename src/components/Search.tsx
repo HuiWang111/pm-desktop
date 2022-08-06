@@ -1,16 +1,13 @@
 import { useState } from 'react'
 import { useRemeshDomain, useRemeshQuery, useRemeshSend } from 'remesh-react'
 import type { ChangeEvent } from 'react'
-import classNames from 'classnames'
 import type { PM } from '@kennys_wang/pm-core'
 import { SearchDomain, AccountDomain } from '@/domains'
-import { Modal } from './Modal'
+import { CreateModal } from './CreateModal'
 
 export function Search() {
   const send = useRemeshSend()
   const [visible, setVisible] = useState(false)
-  const [errorField, setErrorField] = useState<'account' | 'password' | 'confirmPwd' | ''>('')
-  const [message, setMessage] = useState('')
   const searchDomain = useRemeshDomain(SearchDomain())
   const accountDomain = useRemeshDomain(AccountDomain())
   const keyword = useRemeshQuery(searchDomain.query.KeywordQuery())
@@ -22,16 +19,15 @@ export function Search() {
   const handleChange = (e: ChangeEvent<HTMLInputElement>, name: keyof (PM & { confirmPwd?: string })) => {
     send(accountDomain.command.MergeRecordCommand({ [name]: e.target.value }))
   }
-  const handleCancel = () => {
+  const handleCancel = (reset: () => void) => {
     reset()
+    send(accountDomain.command.ClearRecordCommand())
     setVisible(false)
   }
-  const reset = () => {
-    send(accountDomain.command.ClearRecordCommand())
-    setMessage('')
-    setErrorField('')
-  }
-  const handleConfirm = () => {
+  const handleConfirm = (
+    setMessage: (msg: string) => void,
+    setErrorField: (field: 'account' | 'password' | 'confirmPwd' | '') => void
+  ) => {
     try {
       const account = record.account.trim()
       const password = record.password.trim()
@@ -106,78 +102,17 @@ export function Search() {
       >
         创建账号
       </label>
-      <Modal
-        visible={visible}
-        title='创建账号'
-        onCancel={handleCancel}
-        onConfirm={handleConfirm}
-      >
-        <div className='flex justify-center mt-5'>
-          <input
-            type="text"
-            placeholder="请输入账号"
-            className={classNames("input input-bordered input-sm w-full max-w-xs", {
-              'input-error': errorField === 'account'
-            })}
-            value={record.account}
-            onChange={(e) => handleChange(e, 'account')}
-            style={{ color: '#fff' }}
+      {
+        visible && (
+          <CreateModal
+            visible={visible}
+            onCancel={handleCancel}
+            onChange={handleChange}
+            onConfirm={handleConfirm}
+            record={record}
           />
-        </div>
-        <div className='flex justify-center mt-5'>
-          <input
-            type="password"
-            placeholder="请输入密码"
-            className={classNames("input input-bordered input-sm w-full max-w-xs", {
-              'input-error': errorField === 'password'
-            })}
-            value={record.password}
-            onChange={(e) => handleChange(e, 'password')}
-            style={{ color: '#fff' }}
-          />
-        </div>
-        <div className='flex justify-center mt-5'>
-          <input
-            type="password"
-            placeholder="请确认密码"
-            className={classNames("input input-bordered input-sm w-full max-w-xs", {
-              'input-error': errorField === 'confirmPwd'
-            })}
-            value={record.confirmPwd}
-            onChange={(e) => handleChange(e, 'confirmPwd')}
-            style={{ color: '#fff' }}
-          />
-        </div>
-        <div className='flex justify-center mt-5'>
-          <input
-            type="text"
-            placeholder="请输入面板"
-            className="input input-bordered input-sm w-full max-w-xs"
-            value={record.board}
-            onChange={(e) => handleChange(e, 'board')}
-            style={{ color: '#fff' }}
-          />
-        </div>
-        <div className='flex justify-center mt-5'>
-          <input
-            type="text"
-            placeholder="请输入备注"
-            className="input input-bordered input-sm w-full max-w-xs"
-            value={record.remark}
-            onChange={(e) => handleChange(e, 'remark')}
-            style={{ color: '#fff' }}
-          />
-        </div>
-        {
-          errorField && (
-            <div
-              className='mt-3 mb-2 flex justify-center text-xs text-red-400'
-            >
-              { message }
-            </div>
-          )
-        }
-      </Modal>
+        )
+      }
     </div>
   )
 }

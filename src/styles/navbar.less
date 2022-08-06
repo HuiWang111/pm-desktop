@@ -1,0 +1,60 @@
+.navbar.app-navbar {
+  padding-top: 0;
+  padding-right: 0;
+  -webkit-app-region: drag;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  color: rgb(166, 173, 186);
+
+  .system-btn {
+    align-self: flex-start;
+    -webkit-app-region: no-drag;
+
+    .window-icon-wrapper {
+      height: 30px;
+      width: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      & .anticon {
+        cursor: auto;
+      }
+
+      &:hover {
+        background-color: #e5e5e5;
+      }
+
+      &.close-window-icon-wrapper:hover {
+        background-color: #d41325;
+
+        & .anticon {
+          color: #fff;
+        }
+      }
+
+      .window-icon {
+        color: #96989a;
+
+        &.min-window-icon {
+          width: 14px;
+          height: 14px;
+          position: relative;
+  
+          &::before {
+            content: '';
+            width: 12.5px;
+            height: 1.25px;
+            background-color: rgb(166, 173, 186);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+          }
+        }
+      }
+    }
+  }
+}

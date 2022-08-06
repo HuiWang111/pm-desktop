@@ -3,7 +3,7 @@ import type { PM } from '@kennys_wang/pm-core'
 import { RedoOutlined } from '@ant-design/icons'
 import { ArchivedAccountsDomain, AccountDomain } from '@/domains'
 import { useMount } from '@/hooks'
-import { Table } from './Table'
+import { Table } from '@/ui'
 
 export function ArchivedAccounts() {
   const send = useRemeshSend()
@@ -17,7 +17,7 @@ export function ArchivedAccounts() {
   })
 
   return (
-    <div className="archived-accounts mt-5">
+    <main className="archived-accounts main-content mt-5">
       <div>
         <button
           className="btn btn-outline btn-error btn-sm"
@@ -45,7 +45,7 @@ export function ArchivedAccounts() {
             return (
               <>
                 <RedoOutlined
-                  title='恢复'
+                  title='恢复账号'
                   onClick={() => {
                     window.pm.restore([id])
                     send(archivedDomain.command.SetListCommand(window.pm.getArchivedAccounts()))
@@ -66,6 +66,6 @@ export function ArchivedAccounts() {
           }
         }}
       />
-    </div>
+    </main>
   );
 }

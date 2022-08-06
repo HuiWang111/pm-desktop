@@ -1,7 +1,5 @@
 # Password Manager Desktop App
 
 ## TODO
-1. 系统密码校验
-2. core端获取到数据后标记是否是archived
-3. 添加密码校验
-4. core端获取到数据进行倒序
+1. Tabs固定位置
+2. 配置文件格式混乱，但暂时可以用

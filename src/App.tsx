@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import {
   MyAccount,
-  Tabs,
   NavBar,
   ArchivedAccounts
 } from '@/components'
+import { Tabs } from '@/ui'
 import { TabKey } from './types'
 
 function App() {

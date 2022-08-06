@@ -1,15 +1,18 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const { join } = require('path')
 const { format } = require('url')
 const isDev = require('electron-is-dev')
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1440,
+    height: 768,
     webPreferences: {
       preload: join(__dirname, 'src/preload.js')
-    }
+    },
+    minWidth: 800,
+    minHeight: 600,
+    frame: isDev
   })
 
   if (isDev) {
@@ -21,6 +24,24 @@ const createWindow = () => {
       slashes: true,
     }))
   }
+
+  ipcMain.on('min', () => {
+    win.minimize()
+  })
+
+  ipcMain.on('max', () => {
+    if (win.isMaximized()) {
+      win.restore()
+    } else {
+      win.maximize()
+    }
+  })
+
+  ipcMain.on('close', () => {
+    win.close()
+  })
+
+  ipcMain.handle('isMaximized', () => win.isMaximized())
 }
 
 app.on('window-all-closed', () => {

@@ -13,10 +13,19 @@ interface PasswordManager {
   getArchivedAccounts: (mask?: string) => PM[];
   clearArchivedAccounts: () => void;
   restore: (ids: string[]) => void;
+  hasMainPassword: () => boolean;
+  validateMainPassword: (pwd: string) => boolean;
+  setMainPassword: (pwd: string) => void;
+}
+
+interface SystemOperation {
+  setWin: (type: 'min' | 'max' | 'close') => void;
+  isMaximized: () => Promise<boolean>;
 }
 
 declare global {
   interface Window {
-    pm: PasswordManager
+    pm: PasswordManager;
+    os: SystemOperation;
   }
 }

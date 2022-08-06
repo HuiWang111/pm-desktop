@@ -1,4 +1,4 @@
-const { contextBridge, clipboard } = require('electron')
+const { contextBridge, clipboard, ipcRenderer } = require('electron')
 const { join } = require('path')
 const { createPM } = require('@kennys_wang/pm-node-service')
 const { readFileSync } = require('fs')
@@ -23,5 +23,13 @@ contextBridge.exposeInMainWorld('pm', {
   findAccounts: (keyword, mask) => passwordManager.find(keyword, mask),
   getArchivedAccounts: (mask) => passwordManager.getArchive(mask),
   clearArchivedAccounts: () => passwordManager.clean(),
-  restore: (ids) => passwordManager.restore(ids)
+  restore: (ids) => passwordManager.restore(ids),
+  hasMainPassword: () => passwordManager.hasMainPassword(),
+  validateMainPassword: (pwd) => passwordManager.validateMainPassword(pwd),
+  setMainPassword: (pwd) => passwordManager.setMainPassword(pwd),
+})
+
+contextBridge.exposeInMainWorld('os', {
+  setWin: (type) => ipcRenderer.send(type),
+  isMaximized: () => ipcRenderer.invoke('isMaximized')
 })

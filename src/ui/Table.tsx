@@ -38,7 +38,7 @@ export function Table<T extends Record<any, any>>(props: TableProps<T>) {
 
   return (
     <div
-      className={classNames("overflow-x-auto", {
+      className={classNames("overflow-x-auto pb-5", {
         [className || 'none']: Boolean(className)
       })}
       style={{ color: '#fff' }}
