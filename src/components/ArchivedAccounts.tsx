@@ -49,7 +49,7 @@ export function ArchivedAccounts() {
                   onClick={() => {
                     window.pm.restore([id])
                     send(archivedDomain.command.SetListCommand(window.pm.getArchivedAccounts()))
-                    send(accountDomain.command.SetListCommand(window.pm.getArchivedAccounts()))
+                    send(accountDomain.command.SetListCommand(window.pm.getList()))
                   }}
                 />
               </>

@@ -1,4 +1,4 @@
-import { useRemeshDomain, useRemeshQuery, useRemeshSend } from 'remesh-react'
+import { useRemeshDomain, useRemeshQuery, useRemeshSend, useRemeshEvent } from 'remesh-react'
 import { useState, useRef } from 'react'
 import type { PM } from '@kennys_wang/pm-core'
 import {
@@ -33,7 +33,13 @@ export function MyAccount() {
   const showModal = () => setVisible(true)
 
   useMount(() => {
-    send(accountDomain.command.SetListCommand(window.pm.getList()))
+    const list = window.pm.getList()
+    send(accountDomain.command.SetListCommand(list))
+
+    const boards: string[] = [
+      ...list.reduce<Set<string>>((acc, item) => acc.add(item.board), new Set())
+    ]
+    send(accountDomain.command.SetBoardsCommand(boards))
   })
 
   return (
@@ -61,7 +67,7 @@ export function MyAccount() {
                       if (confirm('确认删除该账号吗？')) {
                         window.pm.deleteAccount(id)
                         send(accountDomain.command.SetListCommand(window.pm.getList()))
-                        send(archivedDomain.command.SetListCommand(window.pm.getList()))
+                        send(archivedDomain.command.SetListCommand(window.pm.getArchivedAccounts()))
                       }
                     } catch (e) {
                       console.error(e)

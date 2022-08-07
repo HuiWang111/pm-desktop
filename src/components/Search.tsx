@@ -4,14 +4,17 @@ import type { ChangeEvent } from 'react'
 import type { PM } from '@kennys_wang/pm-core'
 import { SearchDomain, AccountDomain } from '@/domains'
 import { CreateModal } from './CreateModal'
+import { Select } from '@/ui'
 
 export function Search() {
   const send = useRemeshSend()
   const [visible, setVisible] = useState(false)
+  const [board, setBoard] = useState('')
   const searchDomain = useRemeshDomain(SearchDomain())
   const accountDomain = useRemeshDomain(AccountDomain())
   const keyword = useRemeshQuery(searchDomain.query.KeywordQuery())
   const record = useRemeshQuery(accountDomain.query.RecordQuery())
+  const boards = useRemeshQuery(accountDomain.query.BoardsQuery())
   
   const handleKeywordChange = (e: ChangeEvent<HTMLInputElement>) => {
     send(searchDomain.command.SetKeywordCommand(e.target.value))
@@ -81,27 +84,51 @@ export function Search() {
   }
 
   return (
-    <div className="flex">
-      <input
-        type="text"
-        placeholder="请输入账号或备注关键字搜索"
-        className="input input-bordered input-sm w-full max-w-xs"
-        value={keyword}
-        onChange={handleKeywordChange}
-        style={{ color: '#fff' }}
-      />
-      <button
-        className="btn btn-outline btn-sm ml-2"
-        onClick={handleSearch}
-      >
-        搜索
-      </button>
-      <label
-        className="btn btn-primary btn-sm ml-2 modal-button"
-        onClick={() => setVisible(true)}
-      >
-        创建账号
-      </label>
+    <>
+      <div className="flex justify-between text-white">
+        <div className='flex'>
+          <input
+            type="text"
+            placeholder="请输入账号或备注关键字搜索"
+            className="input input-bordered input-sm"
+            value={keyword}
+            onChange={handleKeywordChange}
+            style={{ width: '210px' }}
+          />
+          <button
+            className="btn btn-outline btn-sm ml-2"
+            onClick={handleSearch}
+          >
+            搜索
+          </button>
+          <label
+            className="btn btn-primary btn-sm ml-2 modal-button"
+            onClick={() => setVisible(true)}
+          >
+            创建账号
+          </label>
+        </div>
+        <div className='flex items-center'>
+          <label style={{ whiteSpace: 'nowrap' }}>面板：</label>
+          <Select
+            value={board}
+            onChange={(e) => {
+              const selected = e.target.value
+              const list = window.pm.getList()
+
+              if (selected) {
+                send(accountDomain.command.SetListCommand(list.filter(i => i.board === selected)))
+              } else {
+                send(accountDomain.command.SetListCommand(list))
+              }
+            }}
+            options={[
+              { value: '', label: '全部' },
+              ...boards.map(b => ({ value: b, label: b }))
+            ]}
+          />
+        </div>
+      </div>
       {
         visible && (
           <CreateModal
@@ -113,6 +140,6 @@ export function Search() {
           />
         )
       }
-    </div>
+    </>
   )
 }

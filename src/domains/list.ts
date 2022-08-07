@@ -36,6 +36,23 @@ export const AccountDomain = Remesh.domain({
     })
 
     
+    const BoardsState = domain.state<string[]>({
+      name: 'BoardsState',
+      default: []
+    })
+    const SetBoardsCommand = domain.command({
+      name: 'SetBoardsCommand',
+      impl: ({}, list: string[]) => {
+        return [BoardsState().new(list)]
+      }
+    })
+    const BoardsQuery = domain.query({
+      name: 'BoardsQuery',
+      impl: ({ get }) => {
+        return get(BoardsState())
+      }
+    })
+    
     const PageState = domain.state<number>({
       name: 'PageState',
       default: 1
@@ -84,12 +101,14 @@ export const AccountDomain = Remesh.domain({
         ListQuery,
         PageQuery,
         RecordQuery,
+        BoardsQuery,
       },
       command: {
         SetListCommand,
         SetPageCommand,
         MergeRecordCommand,
         ClearRecordCommand,
+        SetBoardsCommand,
       },
       event: {
         ListChangeEvent,
