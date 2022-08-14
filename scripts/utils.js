@@ -8,14 +8,13 @@ function run(command, options) {
     const child = exec(command, options)
 
     child.stdout.on('data', (data) => {
-      console.info('stdout: ' + data)
+      console.info(data)
     })
-    child.stderr.on('data', (data) => {
-      console.info('stderr: ' + data)
-      reject()
+    child.stdout.on('error', (error) => {
+      reject(error)
     })
     child.stdout.on('close', (code) => {
-      console.info('closing code: ' + code)
+      console.info('close: ' + code)
       resolve()
     })
   })

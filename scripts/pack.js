@@ -24,10 +24,18 @@ async function main() {
       'utf8'
     )
 
+    console.log('=================== start to build web app ============================')
     await run('yarn build')
+
+    console.log('================= start to build electron app =========================')
     await run('yarn make')
-    await run('7z a PasswordManager.zip ./out/PasswordManager-win32-x64/')
-    await run(`move ./PasswordManager.zip ${join(os.homedir(), 'Desktop')}`, {
+
+    console.log('====================== start to make zip ==============================')
+    const zipName = `PasswordManager-${version}.zip`
+    await run(`7z a ${zipName} ./out/PasswordManager-win32-x64/`)
+
+    console.log('====================== start to move zip ==============================')
+    await run(`move ./${zipName} ${join(os.homedir(), 'Desktop')}`, {
       cwd: process.cwd()
     })
   } catch (e) {
