@@ -114,6 +114,9 @@ export function Search() {
             value={board}
             onChange={(e) => {
               const selected = e.target.value
+
+              setBoard(selected)
+
               const list = window.pm.getList()
 
               if (selected) {
