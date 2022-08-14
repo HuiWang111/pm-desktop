@@ -1,11 +1,11 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
 import { useRemeshDomain, useRemeshSend } from 'remesh-react'
 import type { PM } from '@kennys_wang/pm-core'
 import classNames from 'classnames';
 import { AccountDomain } from '@/domains'
 import { Modal } from '@/ui'
-import { useMount } from '@/hooks'
+import { useMount, useEnter } from '@/hooks'
 
 interface EditModalProps {
   data: PM;
@@ -30,11 +30,10 @@ export function EditModal({
     confirmPwd: ''
   })
   const originRecord = useRef<PM>({ ...data })
-  const inputRef = useRef<HTMLInputElement | null>(null)
-
-  useMount(() => {
-    inputRef.current?.focus()
-  })
+  const pwdInputRef = useRef<HTMLInputElement | null>(null)
+  const confirmPwdInputRef = useRef<HTMLInputElement | null>(null)
+  const boardInputRef = useRef<HTMLInputElement | null>(null)
+  const remarkInputRef = useRef<HTMLInputElement | null>(null)
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, name: keyof (PM & { confirmPwd?: string })) => {
     setRecord({
@@ -88,6 +87,32 @@ export function EditModal({
     }
   }
 
+  useMount(() => {
+    pwdInputRef.current?.focus()
+  })
+  useEffect(() => {
+    const pwdSubscription = useEnter(pwdInputRef.current, () => {
+      pwdInputRef.current?.blur()
+      confirmPwdInputRef.current?.focus()
+    })
+    const confirmPwdSubscription = useEnter(confirmPwdInputRef.current, () => {
+      confirmPwdInputRef.current?.blur()
+      boardInputRef.current?.focus()
+    })
+    const boardSubscription = useEnter(boardInputRef.current, () => {
+      boardInputRef.current?.blur()
+      remarkInputRef.current?.focus()
+    })
+    const remarkSubscription = useEnter(remarkInputRef.current, handleConfirm)
+
+    return () => {
+      pwdSubscription.remove()
+      confirmPwdSubscription.remove()
+      boardSubscription.remove()
+      remarkSubscription.remove()
+    }
+  }, [record.password, record.confirmPwd, record.board, record.remark])
+
   return (
     <Modal
       visible={visible}
@@ -115,7 +140,7 @@ export function EditModal({
             value={record.password}
             onChange={(e) => handleChange(e, 'password')}
             style={{ color: '#fff' }}
-            ref={inputRef}
+            ref={pwdInputRef}
           />
         </div>
         <div className='flex justify-center mt-5'>
@@ -128,6 +153,7 @@ export function EditModal({
             value={record.confirmPwd}
             onChange={(e) => handleChange(e, 'confirmPwd')}
             style={{ color: '#fff' }}
+            ref={confirmPwdInputRef}
           />
         </div>
         <div className='flex justify-center mt-5'>
@@ -138,6 +164,7 @@ export function EditModal({
             value={record.board}
             onChange={(e) => handleChange(e, 'board')}
             style={{ color: '#fff' }}
+            ref={boardInputRef}
           />
         </div>
         <div className='flex justify-center mt-5'>
@@ -148,6 +175,7 @@ export function EditModal({
             value={record.remark}
             onChange={(e) => handleChange(e, 'remark')}
             style={{ color: '#fff' }}
+            ref={remarkInputRef}
           />
         </div>
         {

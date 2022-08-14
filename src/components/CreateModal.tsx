@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
 import type { PM } from '@kennys_wang/pm-core'
 import classNames from 'classnames';
 import { Modal } from '@/ui'
-import { useMount } from '@/hooks'
+import { useMount, useEnter } from '@/hooks'
 
 interface CreateModalProps {
   visible: boolean;
@@ -25,7 +25,11 @@ export function CreateModal({
 }: CreateModalProps) {
   const [errorField, setErrorField] = useState<'account' | 'password' | 'confirmPwd' | ''>('')
   const [message, setMessage] = useState('')
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const accountInputRef = useRef<HTMLInputElement | null>(null)
+  const pwdInputRef = useRef<HTMLInputElement | null>(null)
+  const confirmPwdInputRef = useRef<HTMLInputElement | null>(null)
+  const boardInputRef = useRef<HTMLInputElement | null>(null)
+  const remarkInputRef = useRef<HTMLInputElement | null>(null)
 
   const reset = () => {
     setMessage('')
@@ -33,8 +37,39 @@ export function CreateModal({
   }
 
   useMount(() => {
-    inputRef.current?.focus()
+    accountInputRef.current?.focus()
   })
+
+  useEffect(() => {
+    const accountSubscription = useEnter(accountInputRef.current, () => {
+      accountInputRef.current?.blur()
+      pwdInputRef.current?.focus()
+    })
+    const pwdSubscription = useEnter(pwdInputRef.current, () => {
+      pwdInputRef.current?.blur()
+      confirmPwdInputRef.current?.focus()
+    })
+    const confirmPwdSubscription = useEnter(confirmPwdInputRef.current, () => {
+      confirmPwdInputRef.current?.blur()
+      boardInputRef.current?.focus()
+    })
+    const boardSubscription = useEnter(boardInputRef.current, () => {
+      boardInputRef.current?.blur()
+      remarkInputRef.current?.focus()
+    })
+    const remarkSubscription = useEnter(remarkInputRef.current, () => {
+      onConfirm(setMessage, setErrorField)
+    })
+
+    return () => {
+      accountSubscription.remove()
+      pwdSubscription.remove()
+      confirmPwdSubscription.remove()
+      boardSubscription.remove()
+      remarkSubscription.remove()
+    }
+  }, [record.account, record.board, record.confirmPwd, record.password, record.remark])
+
 
   return (
     <Modal
@@ -53,7 +88,7 @@ export function CreateModal({
             value={record.account}
             onChange={(e) => onChange(e, 'account')}
             style={{ color: '#fff' }}
-            ref={inputRef}
+            ref={accountInputRef}
           />
         </div>
         <div className='flex justify-center mt-5'>
@@ -66,6 +101,7 @@ export function CreateModal({
             value={record.password}
             onChange={(e) => onChange(e, 'password')}
             style={{ color: '#fff' }}
+            ref={pwdInputRef}
           />
         </div>
         <div className='flex justify-center mt-5'>
@@ -78,6 +114,7 @@ export function CreateModal({
             value={record.confirmPwd}
             onChange={(e) => onChange(e, 'confirmPwd')}
             style={{ color: '#fff' }}
+            ref={confirmPwdInputRef}
           />
         </div>
         <div className='flex justify-center mt-5'>
@@ -88,6 +125,7 @@ export function CreateModal({
             value={record.board}
             onChange={(e) => onChange(e, 'board')}
             style={{ color: '#fff' }}
+            ref={boardInputRef}
           />
         </div>
         <div className='flex justify-center mt-5'>
@@ -98,10 +136,11 @@ export function CreateModal({
             value={record.remark}
             onChange={(e) => onChange(e, 'remark')}
             style={{ color: '#fff' }}
+            ref={remarkInputRef}
           />
         </div>
         {
-          errorField && (
+          message && (
             <div
               className='mt-3 mb-2 flex justify-center text-xs text-red-400'
             >

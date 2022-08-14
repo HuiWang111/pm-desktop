@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons'
 import { Modal } from '@/ui'
-import { useMount } from '@/hooks'
+import { useMount, useEnter } from '@/hooks'
 
 interface MainPasswordModalProps {
   visible: boolean;
@@ -19,15 +19,32 @@ export function MainPasswordModal({
   const [showPwd, setShowPwd] = useState(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  useMount(() => {
-    inputRef.current?.focus()
-  })
-
   const reset = () => {
     setMsg('')
     setPwd('')
     setShowPwd(false)
   }
+  const handleConfirm = useCallback(() => {
+    const password = pwd.trim()
+    if (password) {
+      onConfirm(password)
+      reset()
+    } else {
+      setMsg('您没有填写主密码')
+    }
+  }, [pwd])
+
+  useMount(() => {
+    inputRef.current?.focus()
+  })
+
+  useEffect(() => {
+    const subscription = useEnter(inputRef.current, handleConfirm)
+
+    return () => {
+      subscription.remove()
+    }
+  }, [pwd])
 
   return (
     <Modal
@@ -36,15 +53,7 @@ export function MainPasswordModal({
         onCancel()
         reset()
       }}
-      onConfirm={() => {
-        const password = pwd.trim()
-        if (password) {
-          onConfirm(password)
-          reset()
-        } else {
-          setMsg('您没有填写主密码')
-        }
-      }}
+      onConfirm={handleConfirm}
     >
       <h3 className='flex justify-center'>您没有设置系统主密码，请先设置主密码</h3>
       <div className='mt-5 flex justify-center items-center'>

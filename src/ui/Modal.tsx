@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom'
+import { useImperativeHandle } from 'react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { noop } from '@/utils'
 

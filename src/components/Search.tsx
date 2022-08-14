@@ -1,15 +1,17 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useRemeshDomain, useRemeshQuery, useRemeshSend } from 'remesh-react'
 import type { ChangeEvent } from 'react'
 import type { PM } from '@kennys_wang/pm-core'
 import { SearchDomain, AccountDomain } from '@/domains'
 import { CreateModal } from './CreateModal'
 import { Select } from '@/ui'
+import { useEnter } from '@/hooks'
 
 export function Search() {
   const send = useRemeshSend()
   const [visible, setVisible] = useState(false)
   const [board, setBoard] = useState('')
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
   const searchDomain = useRemeshDomain(SearchDomain())
   const accountDomain = useRemeshDomain(AccountDomain())
   const keyword = useRemeshQuery(searchDomain.query.KeywordQuery())
@@ -35,7 +37,7 @@ export function Search() {
       const account = record.account.trim()
       const password = record.password.trim()
       const confirmPwd = record.confirmPwd.trim()
-
+      
       if (!account) {
         setMessage('账号为必填项')
         setErrorField('account')
@@ -75,13 +77,17 @@ export function Search() {
       console.error(e)
     }
   }
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     if (keyword) {
       send(accountDomain.command.SetListCommand(window.pm.findAccounts(keyword)))
     } else {
       send(accountDomain.command.SetListCommand(window.pm.getList()))
     }
-  }
+  }, [keyword])
+
+  useEffect(() => {
+    useEnter(searchInputRef.current, handleSearch)
+  }, [keyword])
 
   return (
     <>
@@ -94,6 +100,7 @@ export function Search() {
             value={keyword}
             onChange={handleKeywordChange}
             style={{ width: '210px' }}
+            ref={searchInputRef}
           />
           <button
             className="btn btn-outline btn-sm ml-2"
