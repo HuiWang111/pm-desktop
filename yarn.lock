@@ -582,17 +582,17 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@kennys_wang/pm-core@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@kennys_wang/pm-core/-/pm-core-1.2.0.tgz#ad089a77db309f46f387bfaaf04184a6e45d0f02"
-  integrity sha512-Ca1e3HT+Q1nBrgxwQiwZX86W18CAhwJwW/Uicp4Zes+JefOQ99gbNsCAf6jtG0tFaFEEbxCF0bwiMoxZBF1Gaw==
+"@kennys_wang/pm-core@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@kennys_wang/pm-core/-/pm-core-1.2.1.tgz#98e89d7532c5c336adaa37cdccb7ad8b2666bd54"
+  integrity sha512-eTJTRUpg7wjbqqvRN6W5753fMhAHNYnE2LvFaJLjm0XR81ZVK8DUHy6gqBUrhexur/zfhHGYCPRG3+cxhnf8gA==
 
-"@kennys_wang/pm-node-service@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@kennys_wang/pm-node-service/-/pm-node-service-1.2.0.tgz#5c266c1ad90c6776e56962bc98d5855f932c4694"
-  integrity sha512-nWRSVQtjaJed8uDV4Nf9kegjQQgqRZEXy3u2MKjYmjSI2RZ3BhnIUcNOSwbkr4c7cvCijZ0vgC0pGIS6CcD/Pw==
+"@kennys_wang/pm-node-service@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@kennys_wang/pm-node-service/-/pm-node-service-1.2.1.tgz#397307a7a982bbe4e98f8b70514c483660987cd3"
+  integrity sha512-md7uCWpSPOaUkZnju9Ld0jkzlPL5ITxHD/94Rfb10GJyFLcvpGLlY4FosjRv75+WtjdiHAL0We4BvLLlHiqoUQ==
   dependencies:
-    "@kennys_wang/pm-core" "^1.2.0"
+    "@kennys_wang/pm-core" "^1.2.1"
     crypto-js "^4.1.1"
 
 "@malept/cross-spawn-promise@^1.0.0", "@malept/cross-spawn-promise@^1.1.0":

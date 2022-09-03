@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import type { ChangeEvent } from 'react'
-import { useRemeshDomain, useRemeshSend } from 'remesh-react'
+import { useRemeshDomain, useRemeshSend, useRemeshQuery } from 'remesh-react'
 import type { PM } from '@kennys_wang/pm-core'
 import classNames from 'classnames';
-import { AccountDomain } from '@/domains'
+import { AccountDomain, SearchDomain } from '@/domains'
 import { Modal } from '@/ui'
 import { useMount, useEnter } from '@/hooks'
 
@@ -21,6 +21,7 @@ export function EditModal({
   onConfirm,
 }: EditModalProps) {
   const send = useRemeshSend()
+  const searchDomain = useRemeshDomain(SearchDomain())
   const accountDomain = useRemeshDomain(AccountDomain())
   const [errorField, setErrorField] = useState<'account' | 'password' | 'confirmPwd' | ''>('')
   const [message, setMessage] = useState('')
@@ -34,6 +35,7 @@ export function EditModal({
   const confirmPwdInputRef = useRef<HTMLInputElement | null>(null)
   const boardInputRef = useRef<HTMLInputElement | null>(null)
   const remarkInputRef = useRef<HTMLInputElement | null>(null)
+  const keyword = useRemeshQuery(searchDomain.query.KeywordQuery())
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, name: keyof (PM & { confirmPwd?: string })) => {
     setRecord({
@@ -49,6 +51,13 @@ export function EditModal({
     setMessage('')
     setErrorField('')
   }
+  const handleSearch = useCallback(() => {
+    if (keyword) {
+      send(accountDomain.command.SetListCommand(window.pm.findAccounts(keyword)))
+    } else {
+      send(accountDomain.command.SetListCommand(window.pm.getList()))
+    }
+  }, [keyword])
   const handleConfirm = () => {
     try {
       const password = record.password.trim()
@@ -79,7 +88,7 @@ export function EditModal({
         window.pm.remarkAccount(record.id, remark)
       }
 
-      send(accountDomain.command.SetListCommand(window.pm.getList()))
+      handleSearch()
 
       onConfirm()
     } catch (e) {

@@ -29,7 +29,7 @@ export function Search() {
     send(accountDomain.command.ClearRecordCommand())
     setVisible(false)
   }
-  const handleConfirm = (
+  const handleCreate = (
     setMessage: (msg: string) => void,
     setErrorField: (field: 'account' | 'password' | 'confirmPwd' | '') => void
   ) => {
@@ -69,7 +69,7 @@ export function Search() {
         remark
       })
 
-      send(accountDomain.command.SetListCommand(window.pm.getList()))
+      handleSearch()
 
       setVisible(false)
       send(accountDomain.command.ClearRecordCommand())
@@ -145,7 +145,7 @@ export function Search() {
             visible={visible}
             onCancel={handleCancel}
             onChange={handleChange}
-            onConfirm={handleConfirm}
+            onConfirm={handleCreate}
             record={record}
           />
         )
