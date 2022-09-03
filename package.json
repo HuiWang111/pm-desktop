@@ -1,7 +1,7 @@
 {
   "name": "password-manager",
   "private": true,
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "Password Manager Desktop App",
   "main": "main.js",
   "homepage": ".",
@@ -58,7 +58,7 @@
     "forge": {
       "packagerConfig": {
         "icon": "./public/icon.ico",
-        "appVersion": "1.0.0-beta.3",
+        "appVersion": "1.0.0-beta.4",
         "name": "PasswordManager",
         "appCopyright": "kennys (kennys_wang@163.com)",
         "win32metadata": {
