@@ -14,7 +14,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "import": "electron-forge import",
-    "p": "node scripts/pack.js"
+    "p": "node scripts/pack.js",
+    "prebuild": "electron-rebuild"
   },
   "dependencies": {
     "@ant-design/icons": "4.0.0",
